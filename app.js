@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const errorController = require('./controllers/error');
-
 const User = require('./models/user');
 
 const app = express();
@@ -15,43 +14,45 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById('64c118f8933707a79032459c')
-        .then(user => {
-            req.user = user;
-            next();
-        })
-        .catch(err => console.log(err));
+  User.findById('64c118f8933707a79032459c')
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
 });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
 mongoose
-    .connect(
-        'mongodb+srv://rodrikhsk:vYicLJxCLSCaXPQW@cluster0.kxizuji.mongodb.net/shop?retryWrites=true&w=majority'
-    )
-    .then(result => {
-        User.findOne().then(user => {
-            if (!user) {
-                const user = new User({
-                    name: 'Rodrik',
-                    email: 'rodrik@test.com',
-                    cart: {
-                        items: []
-                    }
-                });
-                user.save();
-            }
+  .connect(
+    'mongodb+srv://rodrikhsk:vYicLJxCLSCaXPQW@cluster0.kxizuji.mongodb.net/shop?retryWrites=true&w=majority'
+  )
+  .then(result => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Max',
+          email: 'max@test.com',
+          cart: {
+            items: []
+          }
         });
-        app.listen(3000);
-    })
-    .catch(err => {
-        console.log(err);
-    })
+        user.save();
+      }
+    });
+    app.listen(3000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
